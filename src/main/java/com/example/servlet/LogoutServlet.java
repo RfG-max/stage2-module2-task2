@@ -9,15 +9,15 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/logout")
-
 public class LogoutServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.removeAttribute("user");
-            session.invalidate();
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        HttpSession httpSession = req.getSession(false);
+        if (httpSession != null) {
+            httpSession.removeAttribute("user");
+            httpSession.invalidate();
         }
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        resp.sendRedirect(req.getContextPath() + "/login.jsp");
     }
 }

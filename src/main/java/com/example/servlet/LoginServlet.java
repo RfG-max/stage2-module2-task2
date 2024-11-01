@@ -1,40 +1,49 @@
 package com.example.servlet;
 
+import com.example.Users;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/login")
-
 public class LoginServlet extends HttpServlet {
     @Override
-    protected void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        if (session.getAttribute("user") != null) {
-            response.sendRedirect("/login.jsp");
-        } else {
-            response.sendRedirect("/user/hello.jsp");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        Object userObject = req.getSession().getAttribute("user");
+        if (userObject==null){
+            //req.getRequestDispatcher("/login.jsp").forward(req,resp);
+            resp.sendRedirect("/login.jsp");
+        } else{
+             //req.getRequestDispatcher("/user/hello.jsp").forward(req, resp);
+            resp.sendRedirect("/user/hello.jsp");
         }
+
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String login = request.getParameter("login");
-        String password = request.getParameter("password");
-        if ((login.equals("user") && !password.isEmpty()) || (login.equals("admin") && !password.isEmpty())) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", login);
-            response.sendRedirect(request.getContextPath() + "/user/hello.jsp");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        Object passObject = req.getParameter("password");
+        Object loginObject = req.getParameter("login");
+        if (passObject==null||loginObject==null) {
+            req.getRequestDispatcher("/login.jsp").forward(req,resp);
         } else {
-            request.setAttribute("error", "Invalid login or password");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/login.jsp");
-            dispatcher.forward(request, response);
+
+            String user = loginObject.toString();
+            String pass = passObject.toString();
+
+            if (Users.getInstance().getUsers().contains(user) && !(pass.isEmpty())) {
+                req.getSession().setAttribute("user",user);
+                //req.getRequestDispatcher("/user/hello.jsp").forward(req, resp);
+                resp.sendRedirect(req.getContextPath() + "/user/hello.jsp");
+            } else {
+                req.getRequestDispatcher("/login.jsp").forward(req, resp);
+            }
         }
     }
 }
