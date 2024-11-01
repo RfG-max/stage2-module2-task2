@@ -1,22 +1,24 @@
 package com.example.filter;
 
+import javax.servlet.*;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebFilter("/user/*")
-public class AuthFilter extends HttpFilter {
+public class AuthFilter implements Filter {
 
     @Override
-    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        HttpSession session = req.getSession(false);
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest httpRequest = (HttpServletRequest) req;
+        HttpServletResponse httpResponse = (HttpServletResponse) res;
+        HttpSession session = httpRequest.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            res.sendRedirect(req.getContextPath() + "/login.jsp");
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login.jsp");
         } else {
             chain.doFilter(req, res);
         }
